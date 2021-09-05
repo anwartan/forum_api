@@ -14,6 +14,8 @@ const CommentRepositoryPostgres = require('./repository/CommentRepositoryPostgre
 const BcryptEncryptionHelper = require('./security/BcryptEncryptionHelper');
 const JwtTokenManager = require('./security/JwtTokenManager');
 const ReplyRepositoryPostgres = require('./repository/ReplyRepositoryPostgres');
+const LikeRepositoryPostgres = require('./repository/LikeRepositoryPostgres');
+
 // use case
 const AddUserUseCase = require('../Applications/use_case/AddUserUseCase');
 const LoginUserUseCase = require('../Applications/use_case/LoginUserUseCase');
@@ -25,6 +27,7 @@ const DeleteCommentUseCase = require('../Applications/use_case/DeleteCommentUseC
 const GetThreadUseCase = require('../Applications/use_case/GetThreadUseCase');
 const AddReplyUseCase = require('../Applications/use_case/AddReplyUseCase');
 const DeleteReplyUseCase = require('../Applications/use_case/DeleteReplyUseCase');
+const LikeDislikeCommentUseCase = require('../Applications/use_case/LikeDislikeCommentUseCase');
 
 const serviceInstanceContainer = {
   userRepository: new UserRepositoryPostgres(pool, nanoid),
@@ -32,6 +35,7 @@ const serviceInstanceContainer = {
   threadRepository: new ThreadRepositoryPostgres(pool, nanoid),
   commentRepository: new CommentRepositoryPostgres(pool, nanoid),
   replyRepository: new ReplyRepositoryPostgres(pool, nanoid),
+  likeRepository: new LikeRepositoryPostgres(pool, nanoid),
   encryptionHelper: new BcryptEncryptionHelper(bcrypt),
   authenticationTokenManager: new JwtTokenManager(Jwt.token),
 };
@@ -61,6 +65,7 @@ const useCaseInstanceContainer = {
     threadRepository: serviceInstanceContainer.threadRepository,
     commentRepository: serviceInstanceContainer.commentRepository,
     replyRepository: serviceInstanceContainer.replyRepository,
+    likeRepository: serviceInstanceContainer.likeRepository,
   }),
   addCommentUseCase: new AddCommentUseCase({
     commentRepository: serviceInstanceContainer.commentRepository,
@@ -76,6 +81,11 @@ const useCaseInstanceContainer = {
   }),
   deleteReplyUseCase: new DeleteReplyUseCase({
     replyRepository: serviceInstanceContainer.replyRepository,
+  }),
+  likeDislikeCommentUseCase: new LikeDislikeCommentUseCase({
+    likeRepository: serviceInstanceContainer.likeRepository,
+    threadRepository: serviceInstanceContainer.threadRepository,
+    commentRepository: serviceInstanceContainer.commentRepository,
   }),
 
 };
