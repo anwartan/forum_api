@@ -376,4 +376,56 @@ describe('/threads endpoint', () => {
       expect(responseJson.status).toEqual('success');
     });
   });
+  describe('when PUT /threads/{id}/comments/{idComment}/likes', () => {
+    it('should response 401 if token is not found,', async () => {
+      const server = await createServer(injections);
+
+      const accessToken = '';
+
+      const response = await server.inject({
+        method: 'PUT',
+        url: '/threads/thread-123/comments/comment-123/likes',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(401);
+      expect(responseJson.message).toEqual('Missing authentication');
+    });
+    it('should response 200 ,', async () => {
+      const server = await createServer(injections);
+      await UsersTableTestHelper.addUser({
+        id: 'user-123', username: 'anwar', password: 'secret', fullname: 'anwar',
+      });
+      await ThreadsTableTestHelper.addThread({
+        id: 'thread-123', owner: 'user-123', title: 'dicoding', body: 'dicoding',
+      });
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-123', owner: 'user-123', content: 'halo', threadId: 'thread-123',
+      });
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-123', owner: 'user-123', content: 'dicoding', threadId: 'thread-123', commentId: 'comment-123',
+      });
+
+      const accessToken = await ServerTestHelper.getAccessToken();
+
+      const response = await server.inject({
+        method: 'PUT',
+        url: '/threads/thread-123/comments/comment-123/likes',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+    });
+  });
 });
