@@ -15,7 +15,7 @@ class GetThreadUseCase {
 
     await Promise.all(comment.map(async (element, index) => {
       comment[index].replies = await this._replyRepository.getReplyByCommentId(element.id);
-      comment[index].likeCount = await this._likeRepository.getLikes(element.id);
+      comment[index].likeCount = (await this._likeRepository.getLikes(element.id)).length;
     }));
     thread.comments = comment;
     return thread;
